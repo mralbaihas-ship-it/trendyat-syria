@@ -1,2 +1,0 @@
-# trendyat-syria
-trendyat-syria
