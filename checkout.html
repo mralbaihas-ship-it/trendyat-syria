@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إتمام الطلب - تريندات</title>
+    <style>
+        body { margin: 80px 20px; font-family: Arial; background: #f9f9f9; }
+        header { position: fixed; top: 0; width: 100%; background: #00A859; color: #fff; padding: 20px; text-align: center; font-size: 24px; z-index: 1000; }
+        .container { max-width: 600px; margin: auto; background: #fff; padding: 30px; border-radius: 15px; }
+        input, textarea { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #ccc; }
+        button { background: #25D366; color: #fff; padding: 15px; width: 100%; border: none; border-radius: 10px; font-size: 20px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <header>إتمام الطلب</header>
+    <div class="container">
+        <h2>بيانات التوصيل</h2>
+        <input type="text" placeholder="الاسم الكامل">
+        <input type="tel" placeholder="رقم الهاتف (واتساب)">
+        <input type="text" placeholder="المحافظة">
+        <textarea placeholder="العنوان التفصيلي"></textarea>
+        <p><strong>طريقة الدفع:</strong> كاش عند الاستلام</p>
+        <button onclick="alert('تم تأكيد الطلب! سنتصل بك قريباً.'); location.href='index.html'">تأكيد الطلب</button>
+    </div>
+</body>
+</html>

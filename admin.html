@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة تحكم - تريندات</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f5f5f5; color: #333; margin: 0; padding: 20px; }
+        .login { max-width: 400px; margin: 100px auto; background: white; padding: 30px; border-radius: 15px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .login input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 8px; }
+        .login button { background: #00A859; color: white; border: none; padding: 12px; width: 100%; border-radius: 8px; cursor: pointer; font-size: 16px; }
+        .dashboard { display: none; max-width: 1200px; margin: auto; background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .sidebar { background: #00A859; color: white; padding: 20px; width: 250px; float: right; height: 100vh; }
+        .sidebar a { display: block; padding: 10px; color: white; text-decoration: none; margin: 10px 0; }
+        .sidebar a:hover { background: rgba(255,255,255,0.2); }
+        .content { margin-right: 250px; padding: 20px; }
+        .section { display: none; }
+        .section.active { display: block; }
+        form { display: grid; gap: 10px; max-width: 500px; }
+        input, textarea, select { padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
+        button { background: #00A859; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: right; }
+        th { background: #00A859; color: white; }
+        .delete { background: red; color: white; }
+        .edit { background: orange; color: white; }
+        @media (max-width: 768px) { .sidebar { width: 100%; height: auto; float: none; } .content { margin-right: 0; } }
+    </style>
+</head>
+<body>
+    <div id="login" class="login">
+        <h2>دخول لوحة التحكم</h2>
+        <input type="password" id="password" placeholder="كلمة السر">
+        <button onclick="login()">دخول</button>
+    </div>
+
+    <div id="dashboard" class="dashboard">
+        <div class="sidebar">
+            <h3>تريندات - لوحة التحكم</h3>
+            <a href="#" onclick="showSection('products')"><i class="fas fa-box"></i> المنتجات</a>
+            <a href="#" onclick="showSection('orders')"><i class="fas fa-shopping-cart"></i> الطلبات</a>
+            <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> خروج</a>
+        </div>
+        <div class="content">
+            <!-- قسم المنتجات -->
+            <div id="products" class="section active">
+                <h2>إدارة المنتجات</h2>
+                <form onsubmit="addProduct(event)">
+                    <input type="text" id="pname" placeholder="اسم المنتج" required>
+                    <input type="number" id="pprice" placeholder="السعر (ل.س)" required>
+                    <input type="url" id="pimage" placeholder="رابط الصورة" required>
+                    <textarea id="pdesc" placeholder="الوصف"></textarea>
+                    <button type="submit">إضافة منتج</button>
+                </form>
+                <table id="productsTable">
+                    <thead><tr><th>اسم</th><th>سعر</th><th>صورة</th><th>وصف</th><th>إجراءات</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <!-- قسم الطلبات -->
+            <div id="orders" class="section">
+                <h2>إدارة الطلبات</h2>
+                <table id="ordersTable">
+                    <thead><tr><th>رقم الطلب</th><th>العميل</th><th>المجموع</th><th>الحالة</th><th>إجراءات</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const PASSWORD = 'trendyat2025';
+        let products = JSON.parse(localStorage.getItem('products')) || [
+            {id: 1, name: 'ساعة شاومي', price: 850000, image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500', desc: 'شاشة AMOLED'},
+            {id: 2, name: 'نايكي أير فورس', price: 1150000, image: 'https://images.unsplash.com/photo-1542291026-7eec264c27?w=500', desc: 'أحذية رياضية'}
+        ];
+        let orders = JSON.parse(localStorage.getItem('orders')) || [];
+
+        function login() {
+            if (document.getElementById('password').value === PASSWORD) {
+                document.getElementById('login').style.display = 'none';
+                document.getElementById('dashboard').style.display = 'block';
+                loadProducts();
+                loadOrders();
+            } else {
+                alert('كلمة السر خاطئة!');
+            }
+        }
+
+        function logout() {
+            document.getElementById('dashboard').style.display = 'none';
+            document.getElementById('login').style.display = 'block';
+            document.getElementById('password').value = '';
+        }
+
+        function showSection(section) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(section).classList.add('active');
+        }
+
+        function addProduct(e) {
+            e.preventDefault();
+            const newProduct = {
+                id: Date.now(),
+                name: document.getElementById('pname').value,
+                price: parseInt(document.getElementById('pprice').value),
+                image: document.getElementById('pimage').value,
+                desc: document.getElementById('pdesc').value
+            };
+            products.push(newProduct);
+            localStorage.setItem('products', JSON.stringify(products));
+            loadProducts();
+            e.target.reset();
+            alert('تم إضافة المنتج!');
+        }
+
+        function loadProducts() {
+            const tbody = document.querySelector('#productsTable tbody');
+            tbody.innerHTML = '';
+            products.forEach(p => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${p.name}</td>
+                    <td>${p.price.toLocaleString()} ل.س</td>
+                    <td><img src="${p.image}" width="50"></td>
+                    <td>${p.desc}</td>
+                    <td>
+                        <button class="edit" onclick="editProduct(${p.id})">تعديل</button>
+                        <button class="delete" onclick="deleteProduct(${p.id})">حذف</button>
+                    </td>
+                `;
+            });
+        }
+
+        function editProduct(id) {
+            const p = products.find(p => p.id === id);
+            document.getElementById('pname').value = p.name;
+            document.getElementById('pprice').value = p.price;
+            document.getElementById('pimage').value = p.image;
+            document.getElementById('pdesc').value = p.desc;
+            deleteProduct(id); // حذف القديم وأعد الإضافة كجديد
+        }
+
+        function deleteProduct(id) {
+            if (confirm('هل أنت متأكد؟')) {
+                products = products.filter(p => p.id !== id);
+                localStorage.setItem('products', JSON.stringify(products));
+                loadProducts();
+            }
+        }
+
+        function loadOrders() {
+            const tbody = document.querySelector('#ordersTable tbody');
+            tbody.innerHTML = '';
+            orders.forEach(o => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${o.id}</td>
+                    <td>${o.customer}</td>
+                    <td>${o.total.toLocaleString()} ل.س</td>
+                    <td>
+                        <select onchange="updateOrderStatus(${o.id}, this.value)">
+                            <option ${o.status === 'new' ? 'selected' : ''}>جديد</option>
+                            <option ${o.status === 'preparing' ? 'selected' : ''}>قيد التجهيز</option>
+                            <option ${o.status === 'shipped' ? 'selected' : ''}>مرسل</option>
+                            <option ${o.status === 'delivered' ? 'selected' : ''}>مُسلّم</option>
+                        </select>
+                    </td>
+                    <td><button class="delete" onclick="deleteOrder(${o.id})">حذف</button></td>
+                `;
+            });
+        }
+
+        function updateOrderStatus(id, status) {
+            const order = orders.find(o => o.id === id);
+            order.status = status;
+            localStorage.setItem('orders', JSON.stringify(orders));
+        }
+
+        function deleteOrder(id) {
+            if (confirm('هل أنت متأكد؟')) {
+                orders = orders.filter(o => o.id !== id);
+                localStorage.setItem('orders', JSON.stringify(orders));
+                loadOrders();
+            }
+        }
+
+        // ربط مع checkout.html (افتراضياً، يمكن توسيعه)
+        // في checkout.html، أضف: localStorage.setItem('orders', JSON.stringify([...orders, {id: Date.now(), customer: name, total: total, status: 'new'}]));
+    </script>
+</body>
+</html>
